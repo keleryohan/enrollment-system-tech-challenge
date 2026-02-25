@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "postgres://app:app@postgres:5432/app"
+      REDIS_URL: "redis://redis:6379"
+      JWT_PRIVATE_KEY_PATH: "/app/keys/jwtRS256.key"
+      JWT_PUBLIC_KEY_PATH: "/app/keys/jwtRS256.key.pub"
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+      - ./keys:/app/keys:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  pgdata:
