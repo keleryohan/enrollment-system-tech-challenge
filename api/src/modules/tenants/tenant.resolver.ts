@@ -8,12 +8,13 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../users/user.entity';
 import { TenantEntity } from './tenant.entity';
+import { RateLimitGuard } from 'src/common/guards/rate-limit.guard';
 
 @Resolver()
 export class TenantsResolver {
   constructor(private readonly tenants: TenantsService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, RateLimitGuard)
   @Roles(UserRole.ADMIN)
   @Mutation(() => TenantType)
   createTenant(@Args('input') input: CreateTenantInput, @Context('req') req: any) {

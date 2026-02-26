@@ -33,16 +33,65 @@ type AuthPayload {
   user: User!
 }
 
+type Course {
+  id: ID!
+  tenantId: ID!
+  title: String!
+  description: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CourseEdgeType {
+  cursor: String!
+  node: Course!
+}
+
+type PageInfoType {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type CourseConnectionType {
+  edges: [CourseEdgeType!]!
+  pageInfo: PageInfoType!
+}
+
+type Enrollment {
+  id: ID!
+  tenantId: ID!
+  userId: ID!
+  course: Course
+  courseId: ID!
+  createdAt: DateTime!
+}
+
 type Query {
+  catalog(first: Int!, after: String): CourseConnectionType!
   ping: String!
-  getUser: User!
+  getUserInTenant: User!
+  myEnrollments: [Enrollment!]!
 }
 
 type Mutation {
+  createCourse(input: CreateCourseInput!): Course!
+  updateCourse(input: UpdateCourseInput!): Course!
   createTenant(input: CreateTenantInput!): Tenant!
   createUser(input: CreateUserInput!): User!
   login(input: LoginInput!): AuthPayload!
   signupStudent(input: SignupInput!): AuthPayload!
+  enroll(input: EnrollInput!): Enrollment!
+}
+
+input CreateCourseInput {
+  title: String!
+  description: String
+}
+
+input UpdateCourseInput {
+  id: ID!
+  title: String
+  description: String
 }
 
 input CreateTenantInput {
@@ -63,4 +112,8 @@ input LoginInput {
 input SignupInput {
   email: String!
   password: String!
+}
+
+input EnrollInput {
+  courseId: ID!
 }

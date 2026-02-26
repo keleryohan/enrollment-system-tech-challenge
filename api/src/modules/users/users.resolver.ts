@@ -7,12 +7,13 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from './user.entity';
 import { CreateUserInput } from './dto/create-user.input';
+import { RateLimitGuard } from 'src/common/guards/rate-limit.guard';
 
 @Resolver()
 export class UsersResolver {
   constructor(private readonly users: UsersService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, RateLimitGuard)
 	@Roles(UserRole.ADMIN)
 	@Mutation(() => UserType)
   async createUser(@Args('input') input: CreateUserInput, @Context('req') req: any) {

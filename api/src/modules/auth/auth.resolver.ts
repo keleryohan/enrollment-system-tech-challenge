@@ -7,6 +7,7 @@ import { UserType } from '../users/dto/user.type';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { SignupInput } from './dto/signup.input';
+import { RateLimitGuard } from 'src/common/guards/rate-limit.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -26,10 +27,11 @@ export class AuthResolver {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RateLimitGuard)
   @Query(() => UserType)
-  async getUser(@Context('req') req: any): Promise<UserType> {
-    return this.auth.getUser(req.user.id) as any;
+  async getUserInTenant(@Context('req') req: any): Promise<UserType> {
+    const tenantId = req.header('x-tenant-id')!;
+    return this.auth.getUserInTenant(req.user.id, tenantId) as any;
   }
 
   @Mutation(() => AuthPayload)

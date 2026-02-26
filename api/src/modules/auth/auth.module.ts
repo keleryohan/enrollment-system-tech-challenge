@@ -12,7 +12,8 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.register({
       privateKey: readFileSync(process.env.JWT_PRIVATE_KEY_PATH!, 'utf8'),
       publicKey: readFileSync(process.env.JWT_PUBLIC_KEY_PATH!, 'utf8'),
-      signOptions: { algorithm: 'RS256', expiresIn: '15m' },
+      // signOptions: { algorithm: 'RS256', expiresIn: '15m' }, //<< undo after testing
+			signOptions: { algorithm: 'RS256', expiresIn: '60m' },
     }),
   ],
   providers: [AuthService, AuthResolver, JwtStrategy],
