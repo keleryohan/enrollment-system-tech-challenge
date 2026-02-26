@@ -11,6 +11,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataLoaderModule } from './loaders/dataloader.module';
+import { DataLoaderFactory } from './loaders/dataloader.factory';
 
 
 @Module({
@@ -25,12 +27,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       logging: ['error', 'warn'],
     }),
 
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'schema.gql'),
-      path: '/graphql',
-      context: ({ req }) => ({ req }),
-    }),
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+			driver: ApolloDriver,
+			imports: [DataLoaderModule],
+			inject: [DataLoaderFactory],
+			useFactory: (factory: DataLoaderFactory) => ({
+				autoSchemaFile: join(process.cwd(), 'schema.gql'),
+				path: '/graphql',
+				context: ({ req }) => {
+					const tenantId = req.header('x-tenant-id');
+					return {
+						req,
+						loaders: tenantId ? factory.create(tenantId) : null,
+					};
+				},
+			}),
+		}),
     PingModule,
     TenantsModule,
     UsersModule,

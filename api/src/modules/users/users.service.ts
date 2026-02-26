@@ -18,8 +18,8 @@ export class UsersService {
     return this.repo.findOne({ where: { tenantId, email } });
   }
 
-  async findByIdOrThrow(id: string) {
-    const user = await this.repo.findOne({ where: { id } });
+  async findUserInTenant(id: string, tenantId: string) {
+    const user = await this.repo.findOne({ where: { id, tenantId } });
     if (!user) throw new NotFoundException('Usuário não encontrado!');
     return user;
   }

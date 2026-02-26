@@ -30,8 +30,8 @@ export class AuthService {
     return { accessToken, user };
   }
 
-  async getUser(userId: string): Promise<UserEntity> {
-    return this.users.findByIdOrThrow(userId);
+  async getUserInTenant(userId: string, tenantId: string): Promise<UserEntity> {
+    return this.users.findUserInTenant(userId, tenantId);
   }
 
   async signupStudent(tenantId: string, email: string, password: string) {
