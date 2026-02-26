@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -13,6 +13,7 @@ import { EnrollmentsModule } from './modules/enrollments/enrollments.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataLoaderModule } from './loaders/dataloader.module';
 import { DataLoaderFactory } from './loaders/dataloader.factory';
+import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 
 
 @Module({
@@ -32,12 +33,15 @@ import { DataLoaderFactory } from './loaders/dataloader.factory';
 			imports: [DataLoaderModule],
 			inject: [DataLoaderFactory],
 			useFactory: (factory: DataLoaderFactory) => ({
-				autoSchemaFile: join(process.cwd(), 'schema.gql'),
+				playground: true,
+				sortSchema: true,
+				autoSchemaFile: join(process.cwd(), 'schema.graphql'),
 				path: '/graphql',
 				context: ({ req }) => {
 					const tenantId = req.header('x-tenant-id');
 					return {
 						req,
+						tenantId,
 						loaders: tenantId ? factory.create(tenantId) : null,
 					};
 				},
@@ -51,4 +55,8 @@ import { DataLoaderFactory } from './loaders/dataloader.factory';
     EnrollmentsModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestContextMiddleware).forRoutes('*');
+  }
+}

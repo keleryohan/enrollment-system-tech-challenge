@@ -17,8 +17,7 @@ export class RolesGuard implements CanActivate {
     if (!roles || roles.length === 0) return true;
 
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
-    const user = req.user;
+    const user = ctx.getContext().req.user;
 
     if (!user?.role) throw new ForbiddenException('Usuário sem função definida');
     if (!roles.includes(user.role)) throw new ForbiddenException('Função inválida para esta operação');

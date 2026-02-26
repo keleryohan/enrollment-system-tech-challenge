@@ -5,12 +5,6 @@ import { RedisService } from './redis.service';
 export class RedisRateLimit {
   constructor(private readonly redis: RedisService) {}
 
-  /**
-   * Sliding window using ZSET:
-   * - add now
-   * - remove < now-window
-   * - count
-   */
   async hit(params: {
     key: string;
     limit: number;

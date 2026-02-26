@@ -21,10 +21,6 @@ export class CoursesService {
 			description: data.description ?? null,
 		});
 
-		console.log('[courses] create called', { tenantId }); //<< remove
-		await this.redis.incr(`debug:incr`);
-		console.log('debug incr ok');
-
 		const saved = await this.repo.save(course);
 
 		await this.bumpCatalogVersion(tenantId);
@@ -49,7 +45,7 @@ export class CoursesService {
     return this.repo.findOne({ where: { id, tenantId } });
   }
 
-	private convertDateFromNode(conn: any) { //<< better way to do it? 
+	private convertDateFromNode(conn: any) {
 		return {
 			...conn,
 			edges: (conn.edges ?? []).map((e: any) => ({

@@ -18,9 +18,8 @@ export class TenantsResolver {
   @Roles(UserRole.ADMIN)
   @Mutation(() => TenantType)
   createTenant(@Args('input') input: CreateTenantInput, @Context('req') req: any) {
-    const userRole = req.user.role;
     const tenantId = req.user.tenantId;
 
-    return this.tenants.createTenant(userRole as UserRole, tenantId, input.name) as Promise<TenantEntity>;
+    return this.tenants.createTenant(tenantId, input.name) as Promise<TenantEntity>;
   }
 }

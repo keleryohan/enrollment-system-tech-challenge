@@ -9,10 +9,6 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private readonly repo: Repository<UserEntity>,
   ) {}
-
-  findByEmail(email: string) {
-    return this.repo.findOne({ where: { email } });
-  }
   
   findByEmailInTenant(tenantId: string, email: string) {
     return this.repo.findOne({ where: { tenantId, email } });

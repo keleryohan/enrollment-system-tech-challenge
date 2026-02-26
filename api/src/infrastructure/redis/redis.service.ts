@@ -3,43 +3,44 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
-  private readonly client: Redis;
+  // rename to avoid getter name conflicts later
+  private readonly redisClient: Redis;
 
   constructor() {
     const url = process.env.REDIS_URL;
     if (!url) throw new Error('REDIS_URL is not set');
 
-    this.client = new Redis(url, {
+    this.redisClient = new Redis(url, {
       maxRetriesPerRequest: 3,
       enableReadyCheck: true,
       lazyConnect: false,
     });
 
-    this.client.on('error', (err) => {
+    this.redisClient.on('error', (err) => {
       console.error('[redis] error:', err);
     });
   }
 
-  get raw() { //<< check if needed
-    return this.client;
+  get raw(): Redis {
+    return this.redisClient;
   }
 
   async onModuleDestroy() {
-    await this.client.quit();
+    await this.redisClient.quit();
   }
 
-  get(key: string) { //<< check if needed
-    return this.client.get(key);
+  get(key: string) {
+    return this.redisClient.get(key);
   }
 
   async getJson<T>(key: string): Promise<T | null> {
-    const v = await this.client.get(key);
+    const v = await this.redisClient.get(key);
     return v ? (JSON.parse(v) as T) : null;
   }
 
   set(key: string, value: string, ttlSeconds?: number) {
-    if (!ttlSeconds) return this.client.set(key, value);
-    return this.client.set(key, value, 'EX', ttlSeconds);
+    if (!ttlSeconds) return this.redisClient.set(key, value);
+    return this.redisClient.set(key, value, 'EX', ttlSeconds);
   }
 
   async setJson(key: string, value: unknown, ttlSeconds?: number) {
@@ -48,11 +49,15 @@ export class RedisService implements OnModuleDestroy {
   }
 
   incr(key: string) {
-    return this.client.incr(key);
+    return this.redisClient.incr(key);
   }
 
-  // Useful for rate limit
   expire(key: string, ttlSeconds: number) {
-    return this.client.expire(key, ttlSeconds);
+    return this.redisClient.expire(key, ttlSeconds);
+  }
+
+  // reset the database for tests
+  async flushDb(): Promise<'OK'> {
+    return this.redisClient.flushdb();
   }
 }

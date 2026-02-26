@@ -21,15 +21,8 @@ export class TenantsService {
     return this.tenantsRepo.findOne({ where: { name } });
   }
 
-
   // rule: only users with ADMIN role from the "admin" tenant can create new tenants
-  async createTenant(
-    role: UserRole, tenantId: string, name: string
-  ): Promise<TenantEntity> {
-    if (role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Apenas usuários com função ADMIN podem criar novos tenants');
-    }
-
+  async createTenant(tenantId: string, name: string): Promise<TenantEntity> {
     // check actor tenant is the platform/admin tenant
     const actorTenant = await this.findByIdOrThrow(tenantId);
     if (actorTenant.name !== 'admin') {
@@ -42,6 +35,6 @@ export class TenantsService {
     }
 
     const tenant = this.tenantsRepo.create({ name });
-    return this.tenantsRepo.save(tenant) as Promise<TenantEntity>;
+    return this.tenantsRepo.save(tenant);
   }
 }

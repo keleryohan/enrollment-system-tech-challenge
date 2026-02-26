@@ -13,7 +13,7 @@ export class AuthService {
 
   async login(tenantId: string, email: string, password: string) {
 
-    const user = await this.users.findByEmail(email);
+    const user = await this.users.findByEmailInTenant(tenantId, email);
     if (!user || user.tenantId !== tenantId) {
       throw new UnauthorizedException('Dados de login inválidos!');
     }
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   async signupStudent(tenantId: string, email: string, password: string) {
-    const existing = await this.users.findByEmail(email);
+    const existing = await this.users.findByEmailInTenant(tenantId, email);
     if (existing) throw new ConflictException('Email already in use');
 
     const user = await this.users.createUser({
