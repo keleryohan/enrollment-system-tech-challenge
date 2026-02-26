@@ -1,0 +1,119 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayload {
+  accessToken: String!
+  user: User!
+}
+
+type Course {
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  tenantId: ID!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type CourseConnectionType {
+  edges: [CourseEdgeType!]!
+  pageInfo: PageInfoType!
+}
+
+type CourseEdgeType {
+  cursor: String!
+  node: Course!
+}
+
+input CreateCourseInput {
+  description: String
+  title: String!
+}
+
+input CreateTenantInput {
+  name: String!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  role: UserRole!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input EnrollInput {
+  courseId: ID!
+}
+
+type Enrollment {
+  course: Course
+  courseId: ID!
+  createdAt: DateTime!
+  id: ID!
+  tenantId: ID!
+  userId: ID!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  createCourse(input: CreateCourseInput!): Course!
+  createTenant(input: CreateTenantInput!): Tenant!
+  createUser(input: CreateUserInput!): User!
+  enroll(input: EnrollInput!): Enrollment!
+  login(input: LoginInput!): AuthPayload!
+  signupStudent(input: SignupInput!): AuthPayload!
+  updateCourse(input: UpdateCourseInput!): Course!
+}
+
+type PageInfoType {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type Query {
+  catalog(after: String, first: Int!): CourseConnectionType!
+  getUserInTenant: User!
+  myEnrollments: [Enrollment!]!
+  ping: String!
+}
+
+input SignupInput {
+  email: String!
+  password: String!
+}
+
+type Tenant {
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
+}
+
+input UpdateCourseInput {
+  description: String
+  id: ID!
+  title: String
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  role: UserRole!
+  tenantId: ID!
+  updatedAt: DateTime!
+}
+
+enum UserRole {
+  ADMIN
+  STUDENT
+}
