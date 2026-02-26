@@ -14,7 +14,7 @@ import { RateLimitGuard } from 'src/common/guards/rate-limit.guard';
 export class TenantsResolver {
   constructor(private readonly tenants: TenantsService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard, RateLimitGuard)
+  @UseGuards(RolesGuard, RateLimitGuard)
   @Roles(UserRole.ADMIN)
   @Mutation(() => TenantType)
   createTenant(@Args('input') input: CreateTenantInput, @Context('req') req: any) {
